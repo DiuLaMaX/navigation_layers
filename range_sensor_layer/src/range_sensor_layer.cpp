@@ -170,6 +170,7 @@ void RangeSensorLayer::reconfigureCB(range_sensor_layer::RangeSensorLayerConfig 
   clear_threshold_ = config.clear_threshold;
   mark_threshold_ = config.mark_threshold;
   clear_on_max_reading_ = config.clear_on_max_reading;
+  obstacle_max_range_ = config.obstacle_max_range;
 
   if (enabled_ != config.enabled)
   {
@@ -241,7 +242,7 @@ void RangeSensorLayer::processVariableRangeMsg(sensor_msgs::Range& range_message
 
   bool clear_sensor_cone = false;
 
-  if (range_message.range == range_message.max_range && clear_on_max_reading_)
+  if ((range_message.range == range_message.max_range && clear_on_max_reading_) || (range_message.range >= obstacle_max_range_ && clear_on_max_reading_))
     clear_sensor_cone = true;
 
   updateCostmap(range_message, clear_sensor_cone);
