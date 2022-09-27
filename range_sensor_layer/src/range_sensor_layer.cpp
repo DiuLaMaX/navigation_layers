@@ -170,6 +170,7 @@ void RangeSensorLayer::reconfigureCB(range_sensor_layer::RangeSensorLayerConfig 
   clear_threshold_ = config.clear_threshold;
   mark_threshold_ = config.mark_threshold;
   clear_on_max_reading_ = config.clear_on_max_reading;
+  obstacle_max_range_ = config.obstacle_max_range;
 
   if (enabled_ != config.enabled)
   {
@@ -244,6 +245,9 @@ void RangeSensorLayer::processVariableRangeMsg(sensor_msgs::Range& range_message
   if (range_message.range == range_message.max_range && clear_on_max_reading_)
     clear_sensor_cone = true;
 
+  if (range_message.range >= obstacle_max_range_ && obstacle_max_range_>0)
+    clear_sensor_cone = true;
+
   updateCostmap(range_message, clear_sensor_cone);
 }
 
@@ -291,7 +295,7 @@ void RangeSensorLayer::updateCostmap(sensor_msgs::Range& range_message, bool cle
 
   // Update Map with Target Point
   unsigned int aa, ab;
-  if (worldToMap(tx, ty, aa, ab))
+  if (worldToMap(tx, ty, aa, ab) && !clear_sensor_cone)
   {
     setCost(aa, ab, 233);
     touch(tx, ty, &min_x_, &min_y_, &max_x_, &max_y_);
