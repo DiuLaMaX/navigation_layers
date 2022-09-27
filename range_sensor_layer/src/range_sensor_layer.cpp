@@ -295,7 +295,7 @@ void RangeSensorLayer::updateCostmap(sensor_msgs::Range& range_message, bool cle
 
   // Update Map with Target Point
   unsigned int aa, ab;
-  if (worldToMap(tx, ty, aa, ab))
+  if (worldToMap(tx, ty, aa, ab) && !clear_sensor_cone)
   {
     setCost(aa, ab, 233);
     touch(tx, ty, &min_x_, &min_y_, &max_x_, &max_y_);
